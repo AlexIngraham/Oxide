@@ -9,7 +9,7 @@ Uploaded images are decoded and processed in memory in the current browser
 tab. The application has no image-upload endpoint, backend, account, database,
 or persistent storage.
 
-**Live demo:** deployment URL pending.
+**Live demo:** [https://oxide-pied.vercel.app/](https://oxide-pied.vercel.app/)
 
 ![Oxide Lab workbench showing a Clarity adjustment, before-and-after reveal, and automatic Rust/WASM versus TypeScript benchmark](docs/oxide-lab-demo.webp)
 
