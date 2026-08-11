@@ -7,7 +7,7 @@
     "package.json": "188e91b3ef3c0f189935d74dfcf5c24c64edc05cec261cb0deeaf04eb2d2fd00",
     "rust_engine.d.ts": "1a38066bbe40f3d0cc2d7e7973974a9b7e0371f562457a0e0a77f82dc344c953",
     "rust_engine.js": "f57d423548fb2d592c5943068dd7d395c3d86655cf0cd8a2f0e07296ff857b89",
-    "rust_engine_bg.wasm": "e4dd7a0a5a17dc36850400463f54f3672d881b550d03ac76dd17f3bbb0cd04b4",
+    "rust_engine_bg.wasm": "41c2f2b4d97086e208974e2e87feff8e09ae1bdfaf0094ae231d249d1a469c9a",
     "rust_engine_bg.wasm.d.ts": "9cd74a75dd252a99cf499a7a46969fa6d9f4059d72357c477c15924631ed66fe"
   }
 }

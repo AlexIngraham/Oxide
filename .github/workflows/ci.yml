@@ -62,18 +62,9 @@ jobs:
         working-directory: web
         run: npm ci
 
-      - name: Rebuild and verify WebAssembly package
+      - name: Verify committed WebAssembly package
         working-directory: web
-        run: npm run build:wasm
-
-      - name: Verify committed WebAssembly bindings are current
-        shell: bash
-        run: |
-          if [[ -n "$(git status --porcelain --untracked-files=all -- web/src/wasm)" ]]; then
-            git status --short --untracked-files=all -- web/src/wasm
-            echo "Generated WebAssembly bindings are out of date. Run npm run build:wasm from web/."
-            exit 1
-          fi
+        run: npm run verify:wasm
 
       - name: Lint, test, typecheck, and build frontend
         working-directory: web

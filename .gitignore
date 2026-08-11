@@ -28,4 +28,8 @@ coverage/
 
 # wasm
 src/wasm/*.wasm
+<<<<<<< HEAD
 src/wasm/build-metadata.json
+=======
+src/wasm/build-metadata.json
+>>>>>>> 496b0933d284c7dcea2df1dabb9f9a12acccacee
