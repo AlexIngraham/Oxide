@@ -1,0 +1,27 @@
+# Operating-system files
+.DS_Store
+Thumbs.db
+
+# Editor settings
+.idea/
+.vscode/*
+!.vscode/extensions.json
+*.sw?
+
+# Local environment files
+.env
+.env.*
+!.env.example
+
+# Logs and test output
+*.log
+coverage/
+
+# Dependency and build output
+/web/node_modules/
+/web/dist/
+/rust-engine/target/
+/rust-engine/pkg/
+
+# Local deployment state
+/.vercel/

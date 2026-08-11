@@ -1,0 +1,9 @@
+* text=auto
+
+*.png binary
+*.wasm binary
+*.webp binary
+
+# wasm-pack output is committed for zero-Rust static deployments, but it is
+# generated and should not dominate GitHub language statistics or reviews.
+web/src/wasm/** linguist-generated=true

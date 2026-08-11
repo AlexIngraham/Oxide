@@ -1,0 +1,9 @@
+{
+  "name": "oxide-lab-workspace",
+  "private": true,
+  "version": "1.0.0",
+  "packageManager": "npm@11.2.0",
+  "engines": {
+    "node": "^22.12.0"
+  }
+}

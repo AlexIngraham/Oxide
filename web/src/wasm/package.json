@@ -1,0 +1,17 @@
+{
+  "name": "rust-engine",
+  "type": "module",
+  "description": "Rust/WebAssembly image-processing kernels for Oxide Lab",
+  "version": "0.1.0",
+  "license": "MIT",
+  "files": [
+    "rust_engine_bg.wasm",
+    "rust_engine.js",
+    "rust_engine.d.ts"
+  ],
+  "main": "rust_engine.js",
+  "types": "rust_engine.d.ts",
+  "sideEffects": [
+    "./snippets/*"
+  ]
+}

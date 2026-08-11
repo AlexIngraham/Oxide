@@ -1,0 +1,80 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  verify:
+    name: Rust, WASM, and web checks
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v7
+
+      - name: Install Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          toolchain: 1.95.0
+          components: clippy,rustfmt
+          targets: wasm32-unknown-unknown
+
+      - name: Cache Rust build output
+        uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: rust-engine -> target
+
+      - name: Check Rust formatting
+        working-directory: rust-engine
+        run: cargo fmt -- --check
+
+      - name: Lint Rust
+        working-directory: rust-engine
+        run: cargo clippy --all-targets --all-features -- -D warnings
+
+      - name: Test Rust
+        working-directory: rust-engine
+        run: cargo test --all-features
+
+      - name: Install wasm-pack
+        uses: taiki-e/install-action@v2
+        with:
+          tool: wasm-pack@0.15.0
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version-file: .node-version
+          cache: npm
+          cache-dependency-path: web/package-lock.json
+
+      - name: Install frontend dependencies
+        working-directory: web
+        run: npm ci
+
+      - name: Rebuild and verify WebAssembly package
+        working-directory: web
+        run: npm run build:wasm
+
+      - name: Verify committed WebAssembly bindings are current
+        shell: bash
+        run: |
+          if [[ -n "$(git status --porcelain --untracked-files=all -- web/src/wasm)" ]]; then
+            git status --short --untracked-files=all -- web/src/wasm
+            echo "Generated WebAssembly bindings are out of date. Run npm run build:wasm from web/."
+            exit 1
+          fi
+
+      - name: Lint, test, typecheck, and build frontend
+        working-directory: web
+        run: npm run check
