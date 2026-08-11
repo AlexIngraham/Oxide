@@ -16,10 +16,15 @@ aggregates four independent comparisons, so its Clarity row differs.</sub>
 
 ## Why I built it
 
-WebAssembly is often pitched as “faster than JavaScript.” In practice that
-depends on the workload and on boundary costs. Oxide implements the same
-image-processing algorithms in both environments and measures them under the
-same conditions.
+I am an avid photographer and spend a lot of time editing in Adobe Lightroom
+Classic. Oxide Lab is where I wanted those two interests to meet: build
+something that feels like a real photo-editing workbench, but as a systems /
+browser-performance project written in code I care about.
+
+That personal angle also set up a technical question. WebAssembly is often
+pitched as “faster than JavaScript.” In practice that depends on the workload
+and on boundary costs. Oxide implements the same image-processing algorithms
+in both environments and measures them under the same conditions.
 
 On the reference M4 Pro run, WASM was **1.27–1.73× faster** for Clarity,
 Gaussian blur, Sobel, and Brightness, while TypeScript won several simpler
