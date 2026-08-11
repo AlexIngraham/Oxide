@@ -25,3 +25,7 @@ coverage/
 
 # Local deployment state
 /.vercel/
+
+# wasm
+src/wasm/*.wasm
+src/wasm/build-metadata.json
