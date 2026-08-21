@@ -1,20 +1,39 @@
 :root {
-  color: #171813;
-  background: #f2f0e8;
+  color-scheme: dark;
+  color: var(--ink);
+  background: var(--bg);
   font-family: var(--font-sans);
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
-  --ink: #171813;
-  --paper: #f2f0e8;
-  --paper-deep: #e6e3d9;
-  --signal: #d8ff55;
-  --blue: #3156e8;
-  --orange: #e65d2f;
-  --line: rgba(23, 24, 19, 0.2);
-  --muted: #696a62;
+  -moz-osx-font-smoothing: grayscale;
+
+  --bg: #12130f;
+  --bg-raised: #1a1b16;
+  --bg-sunken: #0a0b08;
+  --bg-overlay: #22231d;
+  --ink: #eeebe3;
+  --muted: #93958c;
+  --faint: #7a7c74;
+  --line: rgba(238, 235, 227, 0.08);
+  --line-strong: rgba(238, 235, 227, 0.14);
+  --accent: #c5d16a;
+  --accent-text: #12130f;
+  --accent-dim: rgba(197, 209, 106, 0.14);
+  --wasm: #8eb4c8;
+  --js: #d08a5a;
+  --ok: #8fbe72;
+  --ok-dim: rgba(143, 190, 114, 0.12);
+  --warn: #d4a85a;
+  --warn-dim: rgba(212, 168, 90, 0.12);
+  --danger: #e08a72;
+  --danger-dim: rgba(224, 138, 114, 0.12);
+  --radius: 8px;
+  --radius-sm: 6px;
+  --page-gutter: 24px;
   --font-sans: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-  --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  --font-mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Monaco, Consolas, monospace;
+  --ease: 140ms ease;
 }
 
 * {
@@ -23,13 +42,16 @@
 
 html {
   scroll-behavior: smooth;
+  background: var(--bg);
+  scrollbar-color: #3d3e36 var(--bg);
 }
 
 body {
   min-width: 320px;
   min-height: 100vh;
   margin: 0;
-  background: var(--paper);
+  background: var(--bg);
+  color: var(--ink);
 }
 
 button,
@@ -52,13 +74,13 @@ a {
 }
 
 ::selection {
-  color: var(--ink);
-  background: var(--signal);
+  color: var(--accent-text);
+  background: var(--accent);
 }
 
 :focus-visible {
-  outline: 3px solid var(--blue);
-  outline-offset: 3px;
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
 }
 
 @media (prefers-reduced-motion: reduce) {

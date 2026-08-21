@@ -644,9 +644,33 @@ function App() {
   const comparisonStyle = {
     '--reveal-position': `${reveal}%`,
     maxWidth: imageMetadata
-      ? `min(100%, ${690 * previewAspectRatio}px)`
+      ? `min(100%, ${720 * previewAspectRatio}px)`
       : '100%',
   } as CSSProperties
+  const statusKind = isLoadingImage || wasmStatus === 'loading' || isPreviewing || isBenchmarking
+    ? 'busy'
+    : wasmStatus === 'error'
+      ? 'error'
+      : benchmark
+        ? 'ready'
+        : 'idle'
+  const statusLabel = isLoadingImage
+    ? 'Decoding image'
+    : wasmStatus === 'loading'
+      ? 'Loading WASM engine'
+      : wasmStatus === 'error'
+        ? 'WASM unavailable'
+        : isPreviewing
+          ? 'Updating preview'
+          : isBenchmarking
+            ? 'Measuring both engines'
+            : benchmark
+              ? 'Comparison is current'
+              : 'Updates automatically'
+  const timingWinner =
+    benchmark && !isBelowTimerPrecision(benchmark) && benchmark.relative.winner !== 'tie'
+      ? benchmark.relative.winner
+      : null
 
   return (
     <div className="site-shell">
@@ -655,49 +679,41 @@ function App() {
           <span className="brand-mark" aria-hidden="true">
             <span />
           </span>
-          <span>OXIDE / LAB</span>
+          <span className="brand-name">
+            Oxide <span>Lab</span>
+          </span>
         </a>
         <nav className="topbar-nav" aria-label="Primary navigation">
-          <a href="#workbench">Image editor</a>
+          <a href="#workbench">Workbench</a>
           <a href="#architecture">Architecture</a>
         </nav>
       </header>
 
       <main id="top">
-        <section className="hero" aria-labelledby="hero-title">
-          <div className="hero-copy">
-            <p className="eyebrow">RUST / WEBASSEMBLY IMAGE PROCESSING</p>
-            <h1 id="hero-title">
-              <span>Two engines.</span>
-              <span>Speed compared.</span>
-              <span>All local.</span>
-            </h1>
+        <section className="intro" aria-labelledby="hero-title">
+          <div className="intro-copy">
+            <p className="eyebrow">Rust / WebAssembly · TypeScript</p>
+            <h1 id="hero-title">A local image lab that times both engines on the same pixels.</h1>
           </div>
-          <div className="hero-aside">
+          <div className="intro-aside">
             <p>
               Edit with equivalent TypeScript and Rust/WebAssembly filters. The browser compares their output and
               execution time automatically after each change.
             </p>
-            <div className="privacy-note">
+            <p className="privacy-note">
               <svg viewBox="0 0 24 24" aria-hidden="true">
                 <path d="M7 10V8a5 5 0 0 1 10 0v2M5 10h14v11H5z" />
               </svg>
               <span>
-                <strong>Local image editing.</strong> Images are processed in memory and are not uploaded or stored by
-                a server.
+                <strong>Processed in this tab.</strong> Images never leave the browser.
               </span>
-            </div>
-            <a className="hero-cta" href="#workbench">
-              Open image editor <span aria-hidden="true">↓</span>
-            </a>
+            </p>
           </div>
         </section>
 
         <section className="workbench-section" id="workbench" aria-labelledby="workbench-title">
-          <div className="section-heading">
-            <div>
-              <h2 id="workbench-title">Image Editor</h2>
-            </div>
+          <div className="workbench-intro">
+            <h2 id="workbench-title">Workbench</h2>
             <p>Choose a filter and adjust its value. The preview responds first; performance results follow automatically.</p>
           </div>
 
@@ -711,7 +727,7 @@ function App() {
             </div>
           )}
 
-          <div className="workbench">
+          <div className="lab">
             <aside className="control-panel" aria-label="Image processing controls">
               <div className="control-section control-section--source">
                 <div className="control-heading">
@@ -809,22 +825,6 @@ function App() {
               </div>
 
               <div className="control-actions">
-                <output className="auto-process-status" aria-live="polite">
-                  <span aria-hidden="true" />
-                  {isLoadingImage
-                    ? 'Decoding image'
-                    : wasmStatus === 'loading'
-                      ? 'Loading WASM engine'
-                      : wasmStatus === 'error'
-                        ? 'WASM unavailable'
-                        : isPreviewing
-                          ? 'Updating preview'
-                          : isBenchmarking
-                            ? 'Measuring both engines'
-                            : benchmark
-                              ? 'Comparison is current'
-                              : 'Updates automatically'}
-                </output>
                 <button type="button" className="reset-button" onClick={handleReset}>
                   Reset
                 </button>
@@ -833,9 +833,12 @@ function App() {
 
             <div className="visual-workspace">
               <div className="canvas-toolbar">
+                <output className={`auto-process-status auto-process-status--${statusKind}`} aria-live="polite">
+                  <span aria-hidden="true" />
+                  <span>{statusLabel}</span>
+                </output>
                 <fieldset className="engine-switch">
                   <legend className="visually-hidden">Preview output</legend>
-                  <span aria-hidden="true">Preview output</span>
                   <button
                     type="button"
                     aria-pressed={previewEngine === 'wasm'}
@@ -893,7 +896,7 @@ function App() {
                       <div className="stage-label stage-label--original">Original</div>
                       <div className="stage-label stage-label--processed">{activeFilter.label}</div>
                       <div className="reveal-divider" aria-hidden="true">
-                        <span>↔</span>
+                        <span />
                       </div>
                     </>
                   )}
@@ -942,139 +945,139 @@ function App() {
                 </div>
               </div>
             </div>
-          </div>
 
-          <section className="benchmark-panel" aria-labelledby="benchmark-title">
-            <div className="benchmark-heading">
-              <div>
-                <p className="eyebrow">BROWSER BENCHMARK</p>
-                <h3 id="benchmark-title">JavaScript and Rust/WASM performance</h3>
-              </div>
-              <div
-                className={`agreement-badge${
-                  isBenchmarking
-                    ? ' agreement-badge--running'
-                    : benchmark?.agreement.withinTolerance
-                    ? ' agreement-badge--valid'
+            <section className="benchmark-panel" aria-labelledby="benchmark-title">
+              <div className="benchmark-heading">
+                <div>
+                  <p className="eyebrow">Browser benchmark</p>
+                  <h3 id="benchmark-title">JavaScript and Rust/WASM performance</h3>
+                </div>
+                <div
+                  className={`agreement-badge${
+                    isBenchmarking
+                      ? ' agreement-badge--running'
+                      : benchmark?.agreement.withinTolerance
+                      ? ' agreement-badge--valid'
+                      : benchmark
+                        ? ' agreement-badge--near'
+                        : ''
+                  }`}
+                  title={
+                    benchmark
+                      ? `${benchmark.agreement.differingChannels.toLocaleString()} differing channels; maximum channel delta ${benchmark.agreement.maxChannelDelta}.`
+                      : undefined
+                  }
+                  aria-live="polite"
+                >
+                  <span aria-hidden="true">
+                    {isBenchmarking ? '↻' : benchmark?.agreement.withinTolerance ? '✓' : benchmark ? '≈' : '·'}
+                  </span>
+                  {isBenchmarking
+                    ? 'Benchmarking latest edit'
                     : benchmark
-                      ? ' agreement-badge--near'
-                      : ''
-                }`}
-                title={
-                  benchmark
-                    ? `${benchmark.agreement.differingChannels.toLocaleString()} differing channels; maximum channel delta ${benchmark.agreement.maxChannelDelta}.`
-                    : undefined
-                }
-                aria-live="polite"
-              >
-                <span aria-hidden="true">
-                  {isBenchmarking ? '↻' : benchmark?.agreement.withinTolerance ? '✓' : benchmark ? '≈' : '·'}
-                </span>
-                {isBenchmarking
-                  ? 'Benchmarking latest edit'
-                  : benchmark
-                    ? getAgreementLabel(benchmark)
-                    : imageMetadata
-                      ? 'Waiting for comparison'
-                      : 'Awaiting image'}
+                      ? getAgreementLabel(benchmark)
+                      : imageMetadata
+                        ? 'Waiting for comparison'
+                        : 'Awaiting image'}
+                </div>
               </div>
-            </div>
 
-            <div className="benchmark-grid" aria-live="polite">
-              <article className="engine-result">
-                <div className="engine-result-label">
-                  <span className="engine-dot" />
-                  <span>Rust / WASM</span>
-                  <small>wasm-bindgen call</small>
-                </div>
-                <strong>
-                  {benchmark ? formatMilliseconds(benchmark.wasm.medianMs) : '—'}
-                </strong>
-                <div className="timing-track" aria-hidden="true">
-                  <span
-                    style={{ width: benchmark ? timingBarWidth(benchmark.wasm.medianMs) : '0%' }}
-                  />
-                </div>
-                <div className="engine-details">
-                  <span>Throughput</span>
-                  <strong>{benchmark ? formatThroughput(benchmark.wasm.megapixelsPerSecond) : '—'}</strong>
-                </div>
-              </article>
+              <div className="benchmark-grid" aria-live="polite">
+                <article className={`engine-result${timingWinner === 'wasm' ? ' engine-result--winner' : ''}`}>
+                  <div className="engine-result-label">
+                    <span className="engine-dot" />
+                    <span>Rust / WASM</span>
+                    <small>wasm-bindgen call</small>
+                  </div>
+                  <strong>
+                    {benchmark ? formatMilliseconds(benchmark.wasm.medianMs) : '—'}
+                  </strong>
+                  <div className="timing-track" aria-hidden="true">
+                    <span
+                      style={{ width: benchmark ? timingBarWidth(benchmark.wasm.medianMs) : '0%' }}
+                    />
+                  </div>
+                  <div className="engine-details">
+                    <span>Throughput</span>
+                    <strong>{benchmark ? formatThroughput(benchmark.wasm.megapixelsPerSecond) : '—'}</strong>
+                  </div>
+                </article>
 
-              <article className="engine-result engine-result--js">
-                <div className="engine-result-label">
-                  <span className="engine-dot" />
-                  <span>TypeScript</span>
-                  <small>optimized browser JS</small>
-                </div>
-                <strong>
-                  {benchmark ? formatMilliseconds(benchmark.javascript.medianMs) : '—'}
-                </strong>
-                <div className="timing-track" aria-hidden="true">
-                  <span
-                    style={{ width: benchmark ? timingBarWidth(benchmark.javascript.medianMs) : '0%' }}
-                  />
-                </div>
-                <div className="engine-details">
-                  <span>Throughput</span>
-                  <strong>{benchmark ? formatThroughput(benchmark.javascript.megapixelsPerSecond) : '—'}</strong>
-                </div>
-              </article>
+                <article className={`engine-result engine-result--js${timingWinner === 'javascript' ? ' engine-result--winner' : ''}`}>
+                  <div className="engine-result-label">
+                    <span className="engine-dot" />
+                    <span>TypeScript</span>
+                    <small>optimized browser JS</small>
+                  </div>
+                  <strong>
+                    {benchmark ? formatMilliseconds(benchmark.javascript.medianMs) : '—'}
+                  </strong>
+                  <div className="timing-track" aria-hidden="true">
+                    <span
+                      style={{ width: benchmark ? timingBarWidth(benchmark.javascript.medianMs) : '0%' }}
+                    />
+                  </div>
+                  <div className="engine-details">
+                    <span>Throughput</span>
+                    <strong>{benchmark ? formatThroughput(benchmark.javascript.megapixelsPerSecond) : '—'}</strong>
+                  </div>
+                </article>
 
-              <article className="relative-result">
-                <span>Relative result</span>
-                <strong>{benchmark ? getRelativeLabel(benchmark) : '—'}</strong>
+                <article className="relative-result">
+                  <span>Relative result</span>
+                  <strong>{benchmark ? getRelativeLabel(benchmark) : '—'}</strong>
+                  <p>
+                    {benchmark
+                      ? isBelowTimerPrecision(benchmark)
+                        ? 'The operation is too short for a reliable single-call comparison on this timer.'
+                        : benchmark.relative.winner === 'tie'
+                        ? 'Median execution times are within the 3% tie threshold.'
+                        : `Measured on this device for ${activeFilter.label.toLowerCase()}. Lower is better.`
+                      : 'Results depend on the image, filter, browser, and hardware.'}
+                  </p>
+                </article>
+              </div>
+
+              <div className="benchmark-meta">
+                <div>
+                  <span>Resolution</span>
+                  <strong>{imageMetadata ? `${imageMetadata.width} × ${imageMetadata.height}` : '—'}</strong>
+                </div>
+                <div>
+                  <span>Pixels processed</span>
+                  <strong>{imageMetadata ? `${imageMegapixels.toFixed(2)} MP` : '—'}</strong>
+                </div>
+                <div>
+                  <span>Method</span>
+                  <strong>
+                    {benchmark
+                      ? `${benchmark.warmupIterations} warm-up + median of ${benchmark.measuredIterations}`
+                      : 'Warm-up + median'}
+                  </strong>
+                </div>
+                <div>
+                  <span>Timed scope</span>
+                  <strong>Engine call only</strong>
+                </div>
+              </div>
+              <details className="methodology-details">
+                <summary>What exactly is measured?</summary>
                 <p>
-                  {benchmark
-                    ? isBelowTimerPrecision(benchmark)
-                      ? 'The operation is too short for a reliable single-call comparison on this timer.'
-                      : benchmark.relative.winner === 'tie'
-                      ? 'Median execution times are within the 3% tie threshold.'
-                      : `Measured on this device for ${activeFilter.label.toLowerCase()}. Lower is better.`
-                    : 'Results depend on the image, filter, browser, and hardware.'}
+                  After an edit settles, a worker warms up and measures both engines against reusable buffers reset from
+                  the same immutable source outside the timer. WASM initialization, worker messaging, Canvas readback,
+                  and rendering are excluded. The WASM result includes wasm-bindgen allocation and boundary copies—the
+                  cost a browser caller actually pays. Run order alternates to reduce systematic bias.
                 </p>
-              </article>
-            </div>
-
-            <div className="benchmark-meta">
-              <div>
-                <span>Resolution</span>
-                <strong>{imageMetadata ? `${imageMetadata.width} × ${imageMetadata.height}` : '—'}</strong>
-              </div>
-              <div>
-                <span>Pixels processed</span>
-                <strong>{imageMetadata ? `${imageMegapixels.toFixed(2)} MP` : '—'}</strong>
-              </div>
-              <div>
-                <span>Method</span>
-                <strong>
-                  {benchmark
-                    ? `${benchmark.warmupIterations} warm-up + median of ${benchmark.measuredIterations}`
-                    : 'Warm-up + median'}
-                </strong>
-              </div>
-              <div>
-                <span>Timed scope</span>
-                <strong>Engine call only</strong>
-              </div>
-            </div>
-            <details className="methodology-details">
-              <summary>What exactly is measured?</summary>
-              <p>
-                After an edit settles, a worker warms up and measures both engines against reusable buffers reset from
-                the same immutable source outside the timer. WASM initialization, worker messaging, Canvas readback,
-                and rendering are excluded. The WASM result includes wasm-bindgen allocation and boundary copies—the
-                cost a browser caller actually pays. Run order alternates to reduce systematic bias.
-              </p>
-            </details>
-          </section>
+              </details>
+            </section>
+          </div>
         </section>
 
         <section className="architecture-section" id="architecture" aria-labelledby="architecture-title">
-          <div className="section-heading section-heading--dark">
+          <div className="section-heading">
             <div>
-              <p className="eyebrow">ARCHITECTURE</p>
-              <h2 id="architecture-title">Processing architecture</h2>
+              <p className="eyebrow">Architecture</p>
+              <h2 id="architecture-title">How a frame is processed</h2>
             </div>
             <p>
               No API, storage, or server-side processing. A dedicated worker renders the WASM preview first, then
@@ -1082,39 +1085,35 @@ function App() {
             </p>
           </div>
 
-          <figure className="architecture-flow">
+          <figure className="pipeline">
             <figcaption className="visually-hidden">
               Immutable ImageData enters a processing worker for a Rust WebAssembly preview, then branches to
               equivalent TypeScript and Rust kernels for measurement before returning to Canvas.
             </figcaption>
-            <div className="flow-node flow-node--source">
-              <span>01</span>
-              <strong>Image / Canvas</strong>
-              <small>Decode once to immutable RGBA</small>
-            </div>
-            <div className="flow-fork" aria-hidden="true">
-              <span />
-              <i />
-              <i />
-            </div>
-            <div className="flow-branches">
-              <div className="flow-node">
-                <span>02A</span>
-                <strong>TypeScript</strong>
-                <small>Worker typed-array kernel</small>
-              </div>
-              <div className="flow-node flow-node--accent">
-                <span>02B</span>
-                <strong>wasm-bindgen → Rust</strong>
-                <small>Worker boundary + Rust kernel</small>
-              </div>
-            </div>
-            <div className="flow-arrow" aria-hidden="true">→</div>
-            <div className="flow-node flow-node--output">
-              <span>03</span>
-              <strong>Compare / Canvas</strong>
-              <small>Validate, measure, transfer, render</small>
-            </div>
+            <ol className="pipeline-steps">
+              <li className="pipeline-step">
+                <span>01</span>
+                <strong>Image / Canvas</strong>
+                <small>Decode once to immutable RGBA</small>
+              </li>
+              <li className="pipeline-pair">
+                <div className="pipeline-step">
+                  <span>02A</span>
+                  <strong>TypeScript</strong>
+                  <small>Worker typed-array kernel</small>
+                </div>
+                <div className="pipeline-step pipeline-step--accent">
+                  <span>02B</span>
+                  <strong>wasm-bindgen → Rust</strong>
+                  <small>Worker boundary + Rust kernel</small>
+                </div>
+              </li>
+              <li className="pipeline-step pipeline-step--output">
+                <span>03</span>
+                <strong>Compare / Canvas</strong>
+                <small>Validate, measure, transfer, render</small>
+              </li>
+            </ol>
           </figure>
 
           <div className="engineering-principles">
@@ -1139,10 +1138,12 @@ function App() {
           <span className="brand-mark" aria-hidden="true">
             <span />
           </span>
-          <span>OXIDE / LAB</span>
+          <span className="brand-name">
+            Oxide <span>Lab</span>
+          </span>
         </a>
         <p>Client-side image processing with Rust, WebAssembly, TypeScript, and React.</p>
-        <a href="#top">Back to top ↑</a>
+        <a className="footer-top" href="#top">Back to top</a>
       </footer>
     </div>
   )
